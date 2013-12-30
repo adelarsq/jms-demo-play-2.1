@@ -1,0 +1,83 @@
+#{extends 'main.html' /}
+#{set title:'JMS DEMO | Chat' /}
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+
+	// Create a socket
+	var socket = new WebSocket('@@{Application.WebSocket.echo()}');
+   
+	// Message received on the socket
+	socket.onmessage = function(event) {
+	    display(event.data);
+	}
+
+	socket.onopen = function(event){
+		socket.send("Connected...");
+	}
+	
+	socket.onclose = function(event){
+		document.location = "@@{Secure.logout()}";
+	}
+
+	// Display a message
+	var display = function(event) {
+		var data = JSON.parse(event);
+	    $('#thread').append('<p>[' + data.timestamp + ' : '+ padr(data.user, ' ', 300) + ']  ' + data.msg + '</p>');
+	    $('#thread').scrollTo('max');
+	}
+	
+	var padr = function(s, c, n) {
+	    if (! s || ! c || s.length >= n) {
+	        return s;
+	    }
+
+	    var max = (n - s.length)/c.length;
+	    for (var i = 0; i < max; i++) {
+	        s += c;
+	    }
+
+	    return s;
+	}
+	
+  	
+    $('#sendJms').click(function(e) {
+        var message = $('#message').val();
+        $('#message').val('');
+        socket.send(message);
+    });
+   
+    $('#sendDirect').click(function(e) {
+        var message = $('#message').val();
+        $('#message').val('');
+		$.post('@{Application.sendDirect()}', {msg:message});
+    });
+
+    $('#message').keypress(function(e) {
+        if(e.charCode == 13 || e.keyCode == 13) {
+            $('#sendJms').click();
+            e.preventDefault();
+        }
+    });
+
+});
+</script>
+
+<nav id="menu">
+	<ul>
+		<li class="selected">#{a @Application.index()}Chat#{/a}</li>
+		<li>#{a @Application.history()}History#{/a}</li>
+		<li>#{a @Secure.logout()}Logout#{/a}</li>
+		<li>Welcome ${session.get('username').capAll()}!</li>
+	</ul>
+</nav>
+
+<div id="thread">
+</div>
+
+<div id="newMessage">
+    <input type="text" id="message" autocomplete="off">
+	<br />
+    <input type="submit" value="Send via WebSocket" id="sendJms">
+    <input type="submit" value="Send via Direct Endpoint" id="sendDirect">
+</div>

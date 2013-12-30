@@ -1,0 +1,39 @@
+h1. README for this demo
+
+h2. jms-demo for Play! Framework
+
+Based on "Camel module for Play!":https://github.com/marcuspocus/play-camel [1]
+
+bq. Don't forget to run @play deps --sync@ before running the app !
+
+h2. Creating Routes (Queues or Topics)
+
+View the @Bootstrap@ class to learn how to create routes
+
+bc. RouteBuilder routes = new RouteBuilder(){
+	public void configure() throws Exception{
+		from("activemq:queue:myListener").id("chat").bean(MyListener.class);
+		from("activemq:topic:chat").id("chat").bean(Application.class, "onMessage");
+	}
+}
+
+* @MyListener.class@ is a standard class implementing @javax.jms.MessageListener@
+* @Application.class@ is any class, the onMessage method just have a String parameter: The body of the @javax.jms.TextMessage@ will be transformed to a String.
+
+bq. Read "Camel: Routes":http://camel.apache.org/routes.html for more details about routes.
+
+The add routes to @CamelContext@ which will manage @ListenerContainer@.
+
+bc. ctx.addRoutes(routes);
+
+You get access to @CamelContext@ using Injection
+
+bc. @Inject static CamelContext ctx;
+
+To send messages from @Controllers@, @Jobs@, or @Mailer@ classes, you have access to @JmsTemplate@ via @Inject annotation:
+
+bc. @Inject private static JmsTemplate jms;
+
+bq. To send to a topic don't forget to set: @jms.setPubSubDomain(true)@
+
+fn1. Not yet released on Play! modules repository

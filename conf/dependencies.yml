@@ -1,0 +1,14 @@
+# Application dependencies
+
+require:
+    - play
+    - play -> secure
+    - dev -> camel 0.1
+
+repositories:
+    - dev:
+        type: local
+        descriptor: "/Users/marcus/Developments/play_modules/[module]/conf/dependencies.yml" 
+        artifact: "/Users/marcus/Developments/play_modules/[module]" 
+        contains:
+            - dev -> *
