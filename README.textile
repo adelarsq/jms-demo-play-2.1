@@ -2,6 +2,8 @@ h1. README for this demo
 
 h2. jms-demo for Play! Framework
 
+The objetive from this project is to migrate https://github.com/marcuspocus/jms-demo for PlayFramework 2.1
+
 Based on "Camel module for Play!":https://github.com/marcuspocus/play-camel [1]
 
 bq. Don't forget to run @play deps --sync@ before running the app !
